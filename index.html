@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+
+    <style>
+    body { padding: 0; margin: 0; } 
+    #map { height: 550px; width: 100%; }
+    </style>
+</head>
+<body>
+    
+        <button type="button" class="btn btn-outline-primary" id="start">Konumu Paylaş</button>
+        <button type="button" class="btn btn-outline-secondary mr-2" id="stop">Paylaşımı Durdur</button>
+
+
+        <div id="result"></div>
+        <div id='map'></div>
+
+        <script>
+        // Map initialization 
+        var map = L.map('map').setView([37, 35], 6);
+
+        //osm layer
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.hakkicengiz.com">Hakkı Cengiz</a>'
+        });
+        osm.addTo(map);
+
+
+        if(!navigator.geolocation) {
+            console.log("Aygıtınız konum bulmayı desteklemiyor!")
+        } else {
+            setInterval(() => {
+                navigator.geolocation.getCurrentPosition(getPosition)
+            }, 5000);
+
+            map.on('click', function(e){
+                var coord = e.latlng;
+                var lat = coord.lat;
+                var lng = coord.lng;
+                console.log("You clicked the map at latitude: " + lat + " and longitude: " + lng);
+            });
+        }
+
+        var marker, circle, polygon, pointList = [];
+
+        function getPosition(position){
+            // console.log(position)
+            var lat = position.coords.latitude
+            var long = position.coords.longitude
+            var accuracy = position.coords.accuracy
+
+            if(marker) {
+                map.removeLayer(marker)
+            }
+
+            if(circle) {
+                map.removeLayer(circle)
+            }
+
+            marker = L.marker([lat, long])
+            circle = L.circle([lat, long], {radius: accuracy})
+
+            var pointA = new L.LatLng(lat, long);
+            pointList.push(pointA);
+
+            var firstpolyline = new L.Polyline(pointList, {
+                color: 'red',
+                weight: 3,
+                opacity: 0.5,
+                smoothFactor: 1
+            });
+            firstpolyline.addTo(map);
+
+            var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+
+            map.fitBounds(featureGroup.getBounds())
+
+            console.log("Koordinatınız: Lat: "+ lat +" Long: "+ long+ " Doğruluk: "+ accuracy)
+        }
+
+            //
+            let id;
+            let start = document.getElementById('start');
+            let stop = document.getElementById('stop');
+            let result = document.getElementById('result');
+
+            start.onclick = function () {
+                if (navigator.geolocation) {
+                    navigator.geolocation.watchPosition(getPosition);
+                } else {
+                    result.innerHTML = "Geolocation tarayıcınızda desteklenmiyor.";
+                }
+            };
+
+            stop.onclick = function () {
+                navigator.geolocation.clearWatch(id);
+                result.innerHTML = "Konum paylaşımı durduruldu.";
+            };
+        </script>
+
+</body>
+</html>
