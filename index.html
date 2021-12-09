@@ -26,10 +26,10 @@
 
         <script>
         // Map initialization 
-        var map = L.map('map').setView([37, 35], 6);
+        let map = L.map('map').setView([37, 35], 6);
 
         //osm layer
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        let osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.hakkicengiz.com">Hakkı Cengiz</a>'
         });
         osm.addTo(map);
@@ -43,20 +43,20 @@
             }, 5000);
 
             map.on('click', function(e){
-                var coord = e.latlng;
-                var lat = coord.lat;
-                var lng = coord.lng;
+                let coord = e.latlng;
+                let lat = coord.lat;
+                let lng = coord.lng;
                 console.log("Tıkladığınız yerin konumu: " + lat + " ve longitude: " + lng);
             });
         }
 
-        var marker, circle, polygon, pointList = [];
+        let marker, circle, pointList = [];
 
         function getPosition(position){
             // console.log(position)
-            var lat = position.coords.latitude
-            var long = position.coords.longitude
-            var accuracy = position.coords.accuracy
+            let lat = position.coords.latitude
+            let long = position.coords.longitude
+            let accuracy = position.coords.accuracy
 
             if(marker) {
                 map.removeLayer(marker)
@@ -69,18 +69,18 @@
             marker = L.marker([lat, long])
             circle = L.circle([lat, long], {radius: accuracy})
 
-            var pointA = new L.LatLng(lat, long);
+            let pointA = new L.LatLng(lat, long);
             pointList.push(pointA);
 
-            var firstpolyline = new L.Polyline(pointList, {
+            let polyline = new L.Polyline(pointList, {
                 color: 'red',
                 weight: 3,
                 opacity: 0.5,
                 smoothFactor: 1
             });
-            firstpolyline.addTo(map);
+            polyline.addTo(map);
 
-            var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+            let featureGroup = L.featureGroup([marker, circle]).addTo(map)
 
             map.fitBounds(featureGroup.getBounds())
 
